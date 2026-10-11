@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>[zAi] Authenticator — The Faith Standard</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&display=swap">
+<style>
+:root{
+  --bg:#05060a; --panel:#0b0e16; --line:#1b2433;
+  --cyan:#00f0ff; --mag:#ff2bd6; --green:#39ff88; --yel:#f5ff3a; --red:#ff4d6d;
+  --text:#d7e6f5; --dim:#6b7f96;
+  --disp:'Orbitron','Share Tech Mono',ui-monospace,monospace;
+  --mono:'Share Tech Mono',ui-monospace,Menlo,Consolas,monospace;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--mono);}
+body{min-height:100vh;background:
+  radial-gradient(900px 500px at 85% -10%,rgba(255,43,214,.13),transparent 60%),
+  radial-gradient(800px 500px at -10% 10%,rgba(0,240,255,.11),transparent 60%),var(--bg);}
+.wrap{max-width:560px;margin:0 auto;padding:18px 16px 40px}
+header{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.logo{width:44px;height:44px;flex:none;filter:drop-shadow(0 0 8px var(--cyan))}
+h1{font-family:var(--disp);font-weight:900;font-size:19px;letter-spacing:.06em;margin:0;color:var(--cyan);text-shadow:0 0 14px rgba(0,240,255,.55)}
+.sub{color:var(--mag);font-size:12px;letter-spacing:.14em;margin-top:2px;text-shadow:0 0 10px rgba(255,43,214,.5)}
+.badge{margin-left:auto;font-size:11px;padding:4px 8px;border:1px solid var(--green);color:var(--green);border-radius:4px;white-space:nowrap}
+.badge.bad{border-color:var(--red);color:var(--red)}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}
+button,.btn{font-family:var(--mono);font-size:14px;color:var(--cyan);background:transparent;border:1px solid var(--cyan);border-radius:4px;padding:9px 12px;cursor:pointer;transition:box-shadow .15s,background .15s}
+button:hover,.btn:hover{box-shadow:0 0 14px rgba(0,240,255,.45);background:rgba(0,240,255,.07)}
+button:focus-visible,.btn:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--yel);outline-offset:2px}
+button.pri{background:var(--cyan);color:#001318;font-weight:700}
+button.pri:hover{background:#4df6ff}
+button.mag{color:var(--mag);border-color:var(--mag)}
+button.mag:hover{box-shadow:0 0 14px rgba(255,43,214,.45);background:rgba(255,43,214,.07)}
+button.del{color:var(--red);border-color:var(--red);padding:5px 9px;font-size:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--cyan);border-radius:6px;padding:14px;margin-bottom:12px;position:relative}
+.acc{display:flex;align-items:center;gap:14px;cursor:pointer}
+.info{flex:1;min-width:0}
+.issuer{font-size:13px;color:var(--yel);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.label{font-size:12px;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.code{font-family:var(--disp);font-weight:700;font-size:clamp(26px,8vw,34px);letter-spacing:.12em;color:var(--green);text-shadow:0 0 14px rgba(57,255,136,.55);margin-top:4px}
+.code.warn{color:var(--mag);text-shadow:0 0 14px rgba(255,43,214,.6)}
+.ring{width:46px;height:46px;flex:none;position:relative}
+.ring svg{transform:rotate(-90deg)}
+.ring .t{position:absolute;inset:0;display:grid;place-items:center;font-size:13px;color:var(--text)}
+.rowtools{display:flex;justify-content:flex-end;margin-top:8px}
+.empty{border:1px dashed var(--line);border-radius:6px;padding:28px 16px;text-align:center;color:var(--dim);line-height:1.6}
+.empty b{color:var(--cyan);font-weight:400}
+.panel{display:none;background:var(--panel);border:1px solid var(--mag);border-radius:6px;padding:14px;margin-bottom:14px;box-shadow:0 0 22px rgba(255,43,214,.14)}
+.panel.open{display:block}
+.panel h2{font-family:var(--disp);font-size:14px;margin:0 0 10px;color:var(--mag);letter-spacing:.08em}
+label{display:block;font-size:12px;color:var(--dim);margin:10px 0 4px}
+input,select{width:100%;font-family:var(--mono);font-size:15px;color:var(--text);background:#070a11;border:1px solid var(--line);border-radius:4px;padding:10px}
+.grid2{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.hint{font-size:12px;color:var(--dim);margin-top:8px;line-height:1.5}
+.err{color:var(--red);font-size:13px;margin-top:8px;min-height:1em}
+.toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);background:var(--panel);border:1px solid var(--green);color:var(--green);padding:9px 16px;border-radius:4px;opacity:0;pointer-events:none;transition:.2s;z-index:9}
+.toast.show{opacity:1;transform:translateX(-50%)}
+footer{margin-top:28px;text-align:center;font-size:11px;color:var(--dim);line-height:1.8}
+footer b{color:var(--cyan);font-weight:400;letter-spacing:.12em}
+footer i{color:var(--mag);font-style:normal;letter-spacing:.1em}
+#lock{display:none}
+#lock.open{display:block}
+.comet{animation:fl 3.2s ease-in-out infinite}
+@keyframes fl{0%,100%{opacity:1}50%{opacity:.7}}
+@media (prefers-reduced-motion:reduce){.comet{animation:none}*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <svg class="logo comet" viewBox="0 0 64 64" aria-hidden="true">
+      <defs>
+        <linearGradient id="tail" x1="0" y1="1" x2="1" y2="0">
+          <stop offset="0" stop-color="#ff2bd6" stop-opacity="0"/>
+          <stop offset="1" stop-color="#00f0ff"/>
+        </linearGradient>
+      </defs>
+      <path d="M2 60 L30 24" stroke="url(#tail)" stroke-width="5" stroke-linecap="round" fill="none"/>
+      <path d="M10 56 L36 30" stroke="url(#tail)" stroke-width="2.5" stroke-linecap="round" fill="none" opacity=".7"/>
+      <path d="M22 54 L36 10 L50 54 M27.5 40 H44.5" stroke="#00f0ff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <circle cx="36" cy="10" r="3.4" fill="#f5ff3a"/>
+    </svg>
+    <div>
+      <h1>[zAi] AUTHENTICATOR</h1>
+      <div class="sub">THE FAITH STANDARD</div>
+    </div>
+    <div class="badge" id="selftest">TESTING…</div>
+  </header>
+
+  <section class="panel" id="lock">
+    <h2>VAULT LOCKED</h2>
+    <label for="unlockPass">Passphrase</label>
+    <input id="unlockPass" type="password" autocomplete="current-password">
+    <div class="err" id="unlockErr"></div>
+    <div class="bar" style="margin-bottom:0"><button class="pri" id="unlockBtn">Unlock</button></div>
+  </section>
+
+  <div id="main">
+    <div class="bar">
+      <button class="pri" id="btnAdd">+ Add account</button>
+      <label class="btn" style="margin:0;color:var(--cyan)" for="qrFile">Scan QR image</label>
+      <input id="qrFile" type="file" accept="image/*" style="display:none">
+      <button class="mag" id="btnTools">Vault</button>
+    </div>
+
+    <section class="panel" id="addPanel">
+      <h2>ADD ACCOUNT</h2>
+      <label for="uri">otpauth:// link (optional — fills everything)</label>
+      <input id="uri" placeholder="otpauth://totp/Service:you@mail.com?secret=…" autocomplete="off" spellcheck="false">
+      <label for="issuer">Service</label>
+      <input id="issuer" placeholder="Google, GitHub, Binance…" autocomplete="off">
+      <label for="acct">Account</label>
+      <input id="acct" placeholder="you@example.com" autocomplete="off">
+      <label for="secret">Secret key (Base32)</label>
+      <input id="secret" placeholder="JBSW Y3DP EHPK 3PXP" autocomplete="off" spellcheck="false" autocapitalize="characters">
+      <div class="grid2">
+        <div><label for="algo">Algorithm</label><select id="algo"><option>SHA1</option><option>SHA256</option><option>SHA512</option></select></div>
+        <div><label for="digits">Digits</label><select id="digits"><option>6</option><option>7</option><option>8</option></select></div>
+        <div><label for="period">Period (s)</label><input id="period" type="number" value="30" min="10" max="120"></div>
+      </div>
+      <div class="err" id="addErr"></div>
+      <div class="bar" style="margin-bottom:0"><button class="pri" id="saveAcc">Save account</button><button id="cancelAdd">Cancel</button></div>
+    </section>
+
+    <section class="panel" id="toolsPanel">
+      <h2>VAULT</h2>
+      <div class="bar" style="margin-top:0">
+        <button id="btnExport">Export backup</button>
+        <label class="btn" style="margin:0;color:var(--cyan)" for="impFile">Import backup</label>
+        <input id="impFile" type="file" accept="application/json,.json" style="display:none">
+      </div>
+      <label for="newPass">Encrypt vault with a passphrase (AES-256-GCM)</label>
+      <input id="newPass" type="password" autocomplete="new-password" placeholder="New passphrase">
+      <div class="bar" style="margin-bottom:0">
+        <button id="btnEnc">Set passphrase</button>
+        <button id="btnDec" class="del">Remove passphrase</button>
+      </div>
+      <div class="hint">Secrets stay on this device only — nothing is sent anywhere. Without a passphrase they sit in browser storage in plain form, so set one. Exported backups contain your secrets: keep them private.</div>
+    </section>
+
+    <div id="list"></div>
+  </div>
+
+  <footer>
+    <b>[zAi] The Faith Standard</b><br>
+    <i>OWN GOD GIFTED OWN PLATFORM</i>
+  </footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+const $=id=>document.getElementById(id);
+const STORE='zai_auth_vault_v1';
+let accounts=[];           // {id,issuer,label,secret,algo,digits,period}
+let sessionKey=null;       // CryptoKey when vault is encrypted
+let saltB64=null;
+const keyCache=new Map();
+const B32='ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+
+/* ---------- helpers ---------- */
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('show'),1600)}
+function b64(buf){let s='';new Uint8Array(buf).forEach(b=>s+=String.fromCharCode(b));return btoa(s)}
+function unb64(s){return Uint8Array.from(atob(s),c=>c.charCodeAt(0))}
+function uid(){return Math.random().toString(36).slice(2,10)+Date.now().toString(36)}
+
+/* ---------- base32 + TOTP (RFC 4226 / 6238) ---------- */
+function b32dec(s){
+  s=s.replace(/[\s=-]/g,'').toUpperCase();
+  if(!s)throw new Error('Secret key is empty.');
+  let bits='';const out=[];
+  for(const c of s){const i=B32.indexOf(c);if(i<0)throw new Error('Secret has an invalid character: "'+c+'". Base32 uses A–Z and 2–7.');bits+=i.toString(2).padStart(5,'0')}
+  for(let i=0;i+8<=bits.length;i+=8)out.push(parseInt(bits.slice(i,i+8),2));
+  if(!out.length)throw new Error('Secret is too short.');
+  return new Uint8Array(out);
+}
+const HASH={SHA1:'SHA-1',SHA256:'SHA-256',SHA512:'SHA-512'};
+async function hmacKey(a){
+  if(keyCache.has(a.id+a.secret+a.algo))return keyCache.get(a.id+a.secret+a.algo);
+  const k=await crypto.subtle.importKey('raw',b32dec(a.secret),{name:'HMAC',hash:HASH[a.algo]||'SHA-1'},false,['sign']);
+  keyCache.set(a.id+a.secret+a.algo,k);return k;
+}
+async function totp(a,ms){
+  const step=Math.floor(ms/1000/a.period);
+  const buf=new ArrayBuffer(8),dv=new DataView(buf);
+  dv.setUint32(0,Math.floor(step/4294967296));dv.setUint32(4,step>>>0);
+  const sig=new Uint8Array(await crypto.subtle.sign('HMAC',await hmacKey(a),buf));
+  const o=sig[sig.length-1]&15;
+  const bin=((sig[o]&0x7f)<<24)|(sig[o+1]<<16)|(sig[o+2]<<8)|sig[o+3];
+  return String(bin%Math.pow(10,a.digits)).padStart(a.digits,'0');
+}
+async function selfTest(){
+  // RFC 6238 Appendix B: SHA1, secret "12345678901234567890", T=59s -> 94287082
+  try{
+    const r=await totp({id:'t',secret:'GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ',algo:'SHA1',digits:8,period:30},59000);
+    const ok=r==='94287082';
+    const b=$('selftest');b.textContent=ok?'RFC 6238 ✓':'CRYPTO FAIL';b.classList.toggle('bad',!ok);
+  }catch(e){const b=$('selftest');b.textContent='NO WEBCRYPTO';b.classList.add('bad')}
+}
+
+/* ---------- storage (plain or AES-GCM) ---------- */
+async function deriveKey(pass,salt){
+  const base=await crypto.subtle.importKey('raw',new TextEncoder().encode(pass),'PBKDF2',false,['deriveKey']);
+  return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:250000,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+}
+async function save(){
+  try{
+    let rec;
+    if(sessionKey){
+      const iv=crypto.getRandomValues(new Uint8Array(12));
+      const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},sessionKey,new TextEncoder().encode(JSON.stringify(accounts)));
+      rec={v:1,enc:true,salt:saltB64,iv:b64(iv),data:b64(ct)};
+    }else rec={v:1,enc:false,accounts};
+    localStorage.setItem(STORE,JSON.stringify(rec));
+  }catch(e){toast('Storage unavailable — changes last this session only')}
+}
+function readRaw(){try{const s=localStorage.getItem(STORE);return s?JSON.parse(s):null}catch(e){return null}}
+
+/* ---------- rendering ---------- */
+const state=new Map(); // id -> {step,code,el refs}
+const R=19,C=2*Math.PI*R;
+function build(){
+  const list=$('list');list.textContent='';state.clear();
+  if(!accounts.length){
+    const d=document.createElement('div');d.className='empty';
+    d.innerHTML='<b>No accounts yet.</b><br>Add a secret key, paste an otpauth:// link, or scan a QR image.<br>Codes refresh live, exactly like Google Authenticator.';
+    list.appendChild(d);return;
+  }
+  for(const a of accounts){
+    const card=document.createElement('div');card.className='card';
+    const row=document.createElement('div');row.className='acc';row.tabIndex=0;row.setAttribute('role','button');row.setAttribute('aria-label','Copy code for '+(a.issuer||a.label));
+    const info=document.createElement('div');info.className='info';
+    const is=document.createElement('div');is.className='issuer';is.textContent=a.issuer||'Account';
+    const lb=document.createElement('div');lb.className='label';lb.textContent=a.label||'';
+    const cd=document.createElement('div');cd.className='code';cd.textContent='••• •••';
+    info.append(is,lb,cd);
+    const ring=document.createElement('div');ring.className='ring';
+    ring.innerHTML='<svg width="46" height="46" viewBox="0 0 46 46"><circle cx="23" cy="23" r="'+R+'" fill="none" stroke="#1b2433" stroke-width="3"/><circle class="arc" cx="23" cy="23" r="'+R+'" fill="none" stroke="#00f0ff" stroke-width="3" stroke-linecap="round" stroke-dasharray="'+C+'" stroke-dashoffset="0"/></svg><div class="t"></div>';
+    row.append(info,ring);
+    const tools=document.createElement('div');tools.className='rowtools';
+    const del=document.createElement('button');del.className='del';del.textContent='Remove';
+    del.onclick=async()=>{if(confirm('Remove '+(a.issuer||'this account')+'? You will need its secret key to add it again.')){accounts=accounts.filter(x=>x.id!==a.id);await save();build();tick(true)}};
+    tools.appendChild(del);
+    card.append(row,tools);list.appendChild(card);
+    const copy=()=>{const c=state.get(a.id);if(!c||!c.code)return;const raw=c.code;
+      (navigator.clipboard?navigator.clipboard.writeText(raw):Promise.reject()).then(()=>toast('Code copied'),()=>toast('Copy blocked — select the code manually'))};
+    row.onclick=copy;row.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();copy()}};
+    state.set(a.id,{step:-1,code:'',cd,arc:ring.querySelector('.arc'),t:ring.querySelector('.t')});
+  }
+}
+async function tick(force){
+  const now=Date.now();
+  for(const a of accounts){
+    const s=state.get(a.id);if(!s)continue;
+    const step=Math.floor(now/1000/a.period);
+    const left=a.period-((now/1000)%a.period);
+    if(step!==s.step||force){
+      try{
+        const c=await totp(a,now);s.code=c;s.step=step;
+        const h=Math.ceil(c.length/2);s.cd.textContent=c.slice(0,h)+' '+c.slice(h);
+      }catch(e){s.cd.textContent='ERR';s.code=''}
+    }
+    const warn=left<=5;
+    s.cd.classList.toggle('warn',warn);
+    s.arc.setAttribute('stroke',warn?'#ff2bd6':'#00f0ff');
+    s.arc.setAttribute('stroke-dashoffset',String(C*(1-left/a.period)));
+    s.t.textContent=Math.ceil(left);
+  }
+}
+setInterval(()=>tick(false),250);
+
+/* ---------- add / parse ---------- */
+function parseUri(u){
+  let url;try{url=new URL(u.trim())}catch(e){throw new Error('That is not a valid otpauth:// link.')}
+  if(url.protocol!=='otpauth:')throw new Error('Link must start with otpauth://');
+  if(url.hostname!=='totp')throw new Error('Only time-based (totp) accounts are supported.');
+  const p=url.searchParams;
+  let path=decodeURIComponent(url.pathname.replace(/^\//,''));
+  let issuer=p.get('issuer')||'',label=path;
+  if(path.includes(':')){const i=path.indexOf(':');if(!issuer)issuer=path.slice(0,i);label=path.slice(i+1).trim()}
+  const algo=(p.get('algorithm')||'SHA1').toUpperCase();
+  return {issuer,label,secret:p.get('secret')||'',algo:HASH[algo]?algo:'SHA1',digits:[6,7,8].includes(+p.get('digits'))?+p.get('digits'):6,period:+p.get('period')||30};
+}
+function fillForm(o){
+  $('issuer').value=o.issuer||'';$('acct').value=o.label||'';$('secret').value=o.secret||'';
+  $('algo').value=o.algo||'SHA1';$('digits').value=String(o.digits||6);$('period').value=o.period||30;
+}
+$('uri').addEventListener('input',()=>{const v=$('uri').value.trim();if(v.startsWith('otpauth://')){try{fillForm(parseUri(v));$('addErr').textContent=''}catch(e){$('addErr').textContent=e.message}}});
+function show(id,on){$(id).classList.toggle('open',on)}
+$('btnAdd').onclick=()=>{show('toolsPanel',false);show('addPanel',!$('addPanel').classList.contains('open'));$('addErr').textContent=''};
+$('cancelAdd').onclick=()=>show('addPanel',false);
+$('btnTools').onclick=()=>{show('addPanel',false);show('toolsPanel',!$('toolsPanel').classList.contains('open'))};
+$('saveAcc').onclick=async()=>{
+  try{
+    const a={id:uid(),issuer:$('issuer').value.trim(),label:$('acct').value.trim(),secret:$('secret').value.replace(/\s/g,'').toUpperCase(),algo:$('algo').value,digits:+$('digits').value,period:Math.min(120,Math.max(10,+$('period').value||30))};
+    if(!a.issuer&&!a.label)throw new Error('Enter a service or account name.');
+    await totp(a,Date.now()); // validates secret
+    if(accounts.some(x=>x.secret===a.secret&&x.issuer===a.issuer&&x.label===a.label))throw new Error('This account is already in the vault.');
+    accounts.push(a);await save();build();await tick(true);
+    fillForm({});$('uri').value='';show('addPanel',false);toast('Account added');
+  }catch(e){$('addErr').textContent=e.message}
+};
+
+/* ---------- QR image scan (BarcodeDetector, Chrome / Android) ---------- */
+$('qrFile').onchange=async e=>{
+  const f=e.target.files[0];e.target.value='';if(!f)return;
+  if(!('BarcodeDetector' in window)){toast('QR scan not supported here — paste the secret or link');show('addPanel',true);return}
+  try{
+    const bmp=await createImageBitmap(f);
+    const res=await new BarcodeDetector({formats:['qr_code']}).detect(bmp);
+    if(!res.length)throw new Error('No QR code found in that image.');
+    const raw=res[0].rawValue;
+    $('uri').value=raw;fillForm(parseUri(raw));show('toolsPanel',false);show('addPanel',true);$('addErr').textContent='';toast('QR read — check and save');
+  }catch(err){show('addPanel',true);$('addErr').textContent=err.message||'Could not read QR.'}
+};
+
+/* ---------- backup / passphrase ---------- */
+$('btnExport').onclick=()=>{
+  const blob=new Blob([JSON.stringify({app:'zai-authenticator',v:1,accounts},null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='zai-authenticator-backup.json';document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),2000);toast('Backup exported');
+};
+$('impFile').onchange=async e=>{
+  const f=e.target.files[0];e.target.value='';if(!f)return;
+  try{
+    const j=JSON.parse(await f.text());
+    if(!Array.isArray(j.accounts))throw new Error('Not a valid backup file.');
+    let n=0;
+    for(const x of j.accounts){
+      if(!x||!x.secret)continue;
+      const a={id:uid(),issuer:String(x.issuer||''),label:String(x.label||''),secret:String(x.secret).replace(/\s/g,'').toUpperCase(),algo:HASH[x.algo]?x.algo:'SHA1',digits:[6,7,8].includes(+x.digits)?+x.digits:6,period:+x.period||30};
+      try{b32dec(a.secret)}catch(_){continue}
+      if(accounts.some(y=>y.secret===a.secret&&y.issuer===a.issuer&&y.label===a.label))continue;
+      accounts.push(a);n++;
+    }
+    await save();build();await tick(true);toast(n+' account(s) imported');
+  }catch(err){toast(err.message||'Import failed')}
+};
+$('btnEnc').onclick=async()=>{
+  const p=$('newPass').value;if(p.length<6){toast('Use at least 6 characters');return}
+  const salt=crypto.getRandomValues(new Uint8Array(16));saltB64=b64(salt);
+  sessionKey=await deriveKey(p,salt);$('newPass').value='';await save();toast('Vault encrypted');
+};
+$('btnDec').onclick=async()=>{
+  if(!sessionKey){toast('Vault is not encrypted');return}
+  if(!confirm('Remove the passphrase? Secrets will be stored unencrypted on this device.'))return;
+  sessionKey=null;saltB64=null;await save();toast('Passphrase removed');
+};
+$('unlockBtn').onclick=unlock;
+$('unlockPass').addEventListener('keydown',e=>{if(e.key==='Enter')unlock()});
+async function unlock(){
+  const rec=readRaw();if(!rec||!rec.enc)return;
+  try{
+    const key=await deriveKey($('unlockPass').value,unb64(rec.salt));
+    const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:unb64(rec.iv)},key,unb64(rec.data));
+    accounts=JSON.parse(new TextDecoder().decode(pt));sessionKey=key;saltB64=rec.salt;
+    $('unlockPass').value='';show('lock',false);$('main').style.display='';build();tick(true);
+  }catch(e){$('unlockErr').textContent='Wrong passphrase.'}
+}
+
+/* ---------- boot ---------- */
+(function boot(){
+  selfTest();
+  const rec=readRaw();
+  if(rec&&rec.enc){$('main').style.display='none';show('lock',true);return}
+  accounts=(rec&&Array.isArray(rec.accounts))?rec.accounts:[];
+  build();tick(true);
+})();
+})();
+</script>
+</body>
+</html>
